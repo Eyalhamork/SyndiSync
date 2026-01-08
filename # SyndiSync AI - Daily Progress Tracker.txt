@@ -1,0 +1,445 @@
+# SyndiSync AI - Daily Progress Tracker
+**Print this out and check off daily**
+
+---
+
+## ðŸ“… WEEK 1: Foundation (Dec 9-15)
+**Goal: Working upload â†’ generate â†’ download flow**
+
+### Monday Dec 9
+- [ ] Create React + TypeScript project (`npm create vite`)
+- [ ] Install dependencies (Tailwind, Zustand, docxtemplater)
+- [ ] Set up basic routing (React Router)
+- [ ] Create empty components (Dashboard, DocumentGenerator)
+- [ ] Deploy skeleton to Vercel
+
+**Success Metric:** Empty app loads at yourname.vercel.app
+
+### Tuesday Dec 10
+- [ ] Build dashboard layout (sidebar + main area)
+- [ ] Add 4 stat cards (hardcoded numbers)
+- [ ] Create "New Deal" button
+- [ ] Build term sheet upload form
+- [ ] Test file drag-and-drop works
+
+**Success Metric:** Can upload a PDF file
+
+### Wednesday Dec 11
+- [ ] Copy demo-data.js to project
+- [ ] Build fake document generation function
+- [ ] Add loading animation with progress steps
+- [ ] Create document preview component
+- [ ] Test 30-second generation flow
+
+**Success Metric:** Upload â†’ See loading â†’ Get "document"
+
+### Thursday Dec 12
+- [ ] Create actual Word document template (base-template.docx)
+- [ ] Integrate docxtemplater library
+- [ ] Add download button functionality
+- [ ] Test downloading works
+- [ ] Verify Word file opens correctly
+
+**Success Metric:** Can download and open Word document
+
+### Friday Dec 13
+- [ ] Polish upload UI (make it beautiful)
+- [ ] Add success animation after generation
+- [ ] Fix any console errors
+- [ ] Test on phone (mobile view)
+- [ ] Deploy to Vercel
+
+**Success Metric:** Show to 1 friend, they say "nice!"
+
+### Weekend Dec 14-15
+- [ ] Design landing page layout
+- [ ] Add hero section with tagline
+- [ ] Create 3 feature highlights
+- [ ] Make navigation bar
+- [ ] Optional: Fiverr logo design ($50)
+
+**Success Metric:** Landing page looks professional
+
+---
+
+## ðŸ“… WEEK 2: Demo Features (Dec 16-22)
+**Goal: Impressive negotiation + analytics**
+
+### Monday Dec 16
+- [ ] Create negotiation dashboard layout
+- [ ] Display 5 party cards (from demo data)
+- [ ] Add conflict indicator badges
+- [ ] Make cards clickable
+- [ ] Style party avatars (use UI Avatars API)
+
+**Success Metric:** Can see 5 banks with their positions
+
+### Tuesday Dec 17
+- [ ] Build conflict detail modal
+- [ ] Show all 5 party positions side-by-side
+- [ ] Add "Analyze with AI" button
+- [ ] Create AI resolution panel
+- [ ] Add 2-second loading spinner
+
+**Success Metric:** Click button â†’ See AI resolution
+
+### Wednesday Dec 18
+- [ ] Format AI resolution text nicely
+- [ ] Add pros/cons list
+- [ ] Show market data (benchmark chart)
+- [ ] Add predicted acceptance percentage
+- [ ] Style everything beautifully
+
+**Success Metric:** Resolution looks professional
+
+### Thursday Dec 19
+- [ ] Create covenant benchmarking chart (Recharts)
+- [ ] Add one bar chart showing percentiles
+- [ ] Highlight "Your Deal" position
+- [ ] Make it interactive (hover tooltips)
+- [ ] Add source citation
+
+**Success Metric:** Chart looks like real analytics
+
+### Friday Dec 20
+- [ ] Build ROI calculator component
+- [ ] Add animated counter for savings
+- [ ] Create timeline visualization
+- [ ] Add activity feed with fake updates
+- [ ] Polish all spacing and colors
+
+**Success Metric:** Dashboard looks production-ready
+
+### Weekend Dec 21-22
+- [ ] Connect all modules together
+- [ ] Add smooth transitions between pages
+- [ ] Insert demo data everywhere
+- [ ] Create "Try Demo Deal" button
+- [ ] Test full flow 5 times
+
+**Success Metric:** Can complete demo without errors
+
+---
+
+## ðŸ“… WEEK 3: Video Production (Dec 23-29)
+**Goal: Killer 3-minute demo video**
+
+### Monday Dec 23
+- [ ] Read demo video script thoroughly
+- [ ] Practice voiceover (record on phone)
+- [ ] Time yourself (must be <3 min)
+- [ ] Identify weak parts to improve
+- [ ] Revise script if needed
+
+**Success Metric:** Script feels natural when reading
+
+### Tuesday Dec 24
+- [ ] Record screen captures (5 takes per segment)
+- [ ] Segment 1: Upload term sheet
+- [ ] Segment 2: Generation with loading
+- [ ] Segment 3: Document preview
+- [ ] Review recordings, keep best takes
+
+**Success Metric:** Have clean screen recordings
+
+### Wednesday Dec 25 (Christmas)
+- [ ] Optional: Take break or keep working
+- [ ] Record negotiation dashboard segments
+- [ ] Record AI resolution reveal
+- [ ] Record covenant chart interaction
+- [ ] Save all recordings in one folder
+
+**Success Metric:** All demo footage recorded
+
+### Thursday Dec 26
+- [ ] Record voiceover (separate from screen)
+- [ ] Use good microphone or quiet room
+- [ ] Do 3 full takes
+- [ ] Pick best take per section
+- [ ] Save raw audio files
+
+**Success Metric:** Clear, enthusiastic voiceover
+
+### Friday Dec 27
+- [ ] Import all footage into video editor
+- [ ] Sync voiceover with screen recordings
+- [ ] Add background music (YouTube Audio Library)
+- [ ] Cut boring parts (loading screens)
+- [ ] First draft complete
+
+**Success Metric:** 3-minute rough cut
+
+### Saturday Dec 28
+- [ ] Add text overlays ($15B, $2M saved, etc.)
+- [ ] Insert transition effects
+- [ ] Color correct (make UI look vibrant)
+- [ ] Add sound effects (subtle)
+- [ ] Create end screen with contact info
+
+**Success Metric:** Video looks professional
+
+### Sunday Dec 29
+- [ ] Export final video (1080p, MP4)
+- [ ] Upload to YouTube (unlisted)
+- [ ] Test embeds correctly
+- [ ] Show to 3 friends for feedback
+- [ ] Make minor edits if needed
+
+**Success Metric:** Friends say "I'd use this"
+
+---
+
+## ðŸ“… WEEK 4: Submission Prep (Dec 30-Jan 5)
+**Goal: Polish everything, zero failures**
+
+### Monday Dec 30
+- [ ] Test demo flow on 3 different browsers
+- [ ] Fix any console errors
+- [ ] Test on phone (iOS and Android if possible)
+- [ ] Optimize loading speed
+- [ ] Run Lighthouse audit (aim for 90+ performance)
+
+**Success Metric:** Works perfectly everywhere
+
+### Tuesday Dec 31 (New Year's Eve)
+- [ ] Create pitch deck (10 slides)
+- [ ] Slide 1: Title + tagline
+- [ ] Slides 2-4: Problem, solution, demo
+- [ ] Slides 5-7: Market, business model, traction
+- [ ] Slides 8-10: Team, roadmap, contact
+
+**Success Metric:** Deck tells compelling story
+
+### Wednesday Jan 1 (New Year's Day)
+- [ ] Optional: Take break or keep working
+- [ ] Polish pitch deck design
+- [ ] Add screenshots from demo
+- [ ] Insert impressive numbers
+- [ ] Export as PDF
+
+**Success Metric:** Deck looks investor-ready
+
+### Thursday Jan 2
+- [ ] Write text description (300-500 words)
+- [ ] Emphasize business value
+- [ ] Mention LMA compliance
+- [ ] List key features
+- [ ] Proofread 3 times
+
+**Success Metric:** Description is clear and compelling
+
+### Friday Jan 3
+- [ ] Polish GitHub README (if submitting code)
+- [ ] Add architecture diagram
+- [ ] List tech stack
+- [ ] Include setup instructions
+- [ ] Make repo public
+
+**Success Metric:** README looks professional
+
+### Weekend Jan 4-5
+- [ ] Get 5 people to test live site
+- [ ] Watch video with them
+- [ ] Gather feedback
+- [ ] Make final tweaks
+- [ ] Re-deploy if needed
+
+**Success Metric:** No negative feedback
+
+---
+
+## ðŸ“… WEEK 5: Submission (Jan 6-14)
+**Goal: Submit early, optimize**
+
+### Monday Jan 6
+- [ ] Final check: Video plays correctly
+- [ ] Final check: Live URL loads fast
+- [ ] Final check: All links work
+- [ ] Final check: Pitch deck PDF is clean
+- [ ] Take screenshots of everything
+
+**Success Metric:** All materials ready
+
+### Tuesday Jan 7
+- [ ] **SUBMIT TO DEVPOST**
+- [ ] Upload demo video
+- [ ] Add live URL
+- [ ] Upload pitch deck
+- [ ] Link to GitHub (optional)
+- [ ] Screenshot confirmation
+
+**Success Metric:** SUBMITTED! ðŸŽ‰
+
+### Wednesday Jan 8-13
+- [ ] Monitor project page views
+- [ ] Respond to any comments
+- [ ] Share on LinkedIn/Twitter
+- [ ] Email 3 friends to check it out
+- [ ] Optional: Minor improvements if needed
+
+**Success Metric:** Getting views and engagement
+
+### Tuesday Jan 14 (DEADLINE)
+- [ ] Verify submission is visible
+- [ ] Check all links one more time
+- [ ] Take final screenshots
+- [ ] Celebrate! ðŸŽŠ
+
+**Success Metric:** Submitted before deadline
+
+---
+
+## ðŸŽ¯ DAILY STANDUP QUESTIONS
+
+Ask yourself every morning:
+1. âœ… What am I building TODAY that judges will see?
+2. âœ… Does this make the demo more impressive?
+3. âœ… Can I fake this instead of building it?
+4. âœ… What's the biggest risk today?
+
+Ask yourself every evening:
+1. âœ… Can I demo what I built today?
+2. âœ… Did I make progress toward winning?
+3. âœ… What's tomorrow's ONE priority?
+
+---
+
+## ðŸš¨ RED FLAGS (Stop and Fix Immediately)
+
+- âš ï¸ Demo takes >5 seconds to load
+- âš ï¸ Console shows errors
+- âš ï¸ Video is >3 minutes long
+- âš ï¸ Live site is down
+- âš ï¸ Can't complete demo flow
+- âš ï¸ UI looks amateurish
+- âš ï¸ Voiceover is unclear
+
+---
+
+## âœ… SUBMISSION CHECKLIST
+
+48 Hours Before Deadline:
+- [ ] Demo works on Chrome, Safari, Firefox
+- [ ] Mobile layout doesn't break
+- [ ] Video plays on all devices
+- [ ] All screenshots are high quality
+- [ ] Text description has no typos
+- [ ] Pitch deck PDF is under 10MB
+- [ ] GitHub repo is clean (if submitting)
+
+24 Hours Before Deadline:
+- [ ] Submit to Devpost (don't wait!)
+- [ ] Verify submission is public
+- [ ] Test all submission links
+- [ ] Take screenshots of submission
+- [ ] Share with 3 friends
+
+After Submission:
+- [ ] Celebrate! ðŸŽ‰
+- [ ] Monitor for comments
+- [ ] Respond quickly to questions
+- [ ] Share on social media
+
+---
+
+## ðŸ“Š SUCCESS METRICS BY WEEK
+
+### Week 1 Success
+âœ… Can upload â†’ generate â†’ download
+âœ… Deployed to live URL
+âœ… No console errors
+
+### Week 2 Success
+âœ… Full demo flow works
+âœ… UI looks professional
+âœ… One impressive chart
+
+### Week 3 Success
+âœ… 3-minute demo video complete
+âœ… Video quality is high
+âœ… Friends say "wow"
+
+### Week 4 Success
+âœ… Everything works perfectly
+âœ… Pitch deck is compelling
+âœ… Zero demo failures
+
+### Week 5 Success
+âœ… SUBMITTED to Devpost
+âœ… Getting views/comments
+âœ… Ready for judging
+
+---
+
+## ðŸ† WINNING CRITERIA REMINDER
+
+Judges are scoring on:
+1. **Design** (Is it well thought out and scalable?)
+2. **Potential Impact** (Does it solve a real problem?)
+3. **Quality of Idea** (Is it unique and innovative?)
+4. **Market Opportunity** (Is there a clear value proposition?)
+
+Your advantage:
+- âœ… You understand the problem deeply
+- âœ… You have a clear solution
+- âœ… You can articulate business value
+- âœ… You're building something judges need
+
+---
+
+## ðŸ’ª MOTIVATION REMINDERS
+
+When you feel overwhelmed:
+- ðŸŽ¯ You only need to impress for 3 minutes
+- ðŸŽ¯ Demo magic > production code
+- ðŸŽ¯ You've learned from past hackathons
+- ðŸŽ¯ Your idea is genuinely valuable
+- ðŸŽ¯ $12,500 is worth the effort
+
+When you feel behind schedule:
+- ðŸŽ¯ Cut features ruthlessly
+- ðŸŽ¯ Fake what you can't build
+- ðŸŽ¯ Focus on demo video quality
+- ðŸŽ¯ Perfect > comprehensive
+
+When you feel confident:
+- ðŸŽ¯ Keep going!
+- ðŸŽ¯ Polish, polish, polish
+- ðŸŽ¯ Test with real people
+- ðŸŽ¯ Make it even better
+
+---
+
+## ðŸŽ¯ THE ONE-PAGE REMINDER
+
+**What Judges See:**
+- Demo video (3 min)
+- Live site (2 min)
+- Pitch deck (if they read)
+
+**What Judges Don't See:**
+- Your code
+- Your late nights
+- Your technical complexity
+
+**Therefore:**
+- Make the video PERFECT
+- Make the UI BEAUTIFUL
+- Make the value OBVIOUS
+
+**You've got this!** ðŸš€
+
+---
+
+**Current Week:** _____
+**Days Until Deadline:** _____
+**Today's Priority:** _________________
+
+**Biggest Risk:** _________________
+**Mitigation Plan:** _________________
+
+**Today's Win:** _________________
+
+---
+
+Print this. Pin it to your wall. Check boxes daily. Win the hackathon. ðŸ†
