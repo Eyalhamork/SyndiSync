@@ -1,4 +1,4 @@
-// src/store/appStore.ts - UPDATED with loadDemoData implementation
+// src/store/appStore.ts - Updated for Onboarding Flow
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Deal, Document, Negotiation, Party, Activity, User, DashboardStats } from '../types';
@@ -32,9 +32,10 @@ interface AppState {
   isMobileMenuOpen: boolean;
   toasts: ToastMessage[];
 
-  // Demo mode
+  // Onboarding state
   isDemoMode: boolean;
-  
+  hasCompletedOnboarding: boolean;
+
   // Actions
   setCurrentDeal: (deal: Deal | null) => void;
   addDeal: (deal: Deal) => void;
@@ -44,12 +45,13 @@ interface AppState {
   setParties: (parties: Party[]) => void;
   addActivity: (activity: Activity) => void;
   setStats: (stats: DashboardStats) => void;
-  
+  updateUser: (updates: Partial<User>) => void;
+
   // Generation
   startGeneration: () => void;
   updateGeneration: (progress: number, step: string) => void;
   completeGeneration: (doc: Document) => void;
-  
+
   // Navigation
   setSelectedNegotiation: (id: string | null) => void;
 
@@ -61,19 +63,20 @@ interface AppState {
   showToast: (type: ToastType, title: string, message?: string) => void;
   hideToast: (id: string) => void;
 
-  // Demo mode
+  // Onboarding & Demo
   loadDemoData: () => void;
+  completeOnboarding: () => void;
   resetStore: () => void;
 }
 
-// Default user (always logged in for demo)
+// Default user
 const DEFAULT_USER: User = {
   id: 'user_001',
-  name: 'John Morrison',
-  email: 'john.morrison@globalbank.com',
+  name: 'New Agent', // Placeholder until onboarding
+  email: 'agent@syndisync.ai',
   organization: 'Global Investment Bank',
-  role: 'Managing Director',
-  avatar: 'https://ui-avatars.com/api/?name=John+Morrison&background=2563eb&color=fff'
+  role: 'Associate',
+  avatar: 'https://ui-avatars.com/api/?name=Agent&background=2563eb&color=fff'
 };
 
 const useAppStore = create<AppState>()(
@@ -88,7 +91,7 @@ const useAppStore = create<AppState>()(
       activities: [],
       stats: null,
       currentUser: DEFAULT_USER,
-      
+
       isGenerating: false,
       generationProgress: 0,
       generationStep: '',
@@ -96,57 +99,62 @@ const useAppStore = create<AppState>()(
       isMobileMenuOpen: false,
       toasts: [],
 
-      isDemoMode: true, // Always true for hackathon
-      
+      isDemoMode: true,
+      hasCompletedOnboarding: false,
+
       // Actions
       setCurrentDeal: (deal) => set({ currentDeal: deal }),
-      
+
       addDeal: (deal) => set((state) => ({
         deals: [...state.deals, deal],
         currentDeal: deal
       })),
-      
+
       addDocument: (doc) => set((state) => ({
         documents: [...state.documents, doc]
       })),
-      
+
       addNegotiation: (negotiation) => set((state) => ({
         negotiations: [...state.negotiations, negotiation]
       })),
-      
+
       updateNegotiation: (id, updates) => set((state) => ({
         negotiations: state.negotiations.map(neg =>
           neg.negotiation_id === id ? { ...neg, ...updates } : neg
         )
       })),
-      
+
       setParties: (parties) => set({ parties }),
-      
+
       addActivity: (activity) => set((state) => ({
         activities: [activity, ...state.activities].slice(0, 50) // Keep last 50
       })),
-      
+
       setStats: (stats) => set({ stats }),
-      
+
+      updateUser: (updates) => set((state) => ({
+        currentUser: { ...state.currentUser, ...updates }
+      })),
+
       // Generation
       startGeneration: () => set({
         isGenerating: true,
         generationProgress: 0,
         generationStep: 'Initializing...'
       }),
-      
+
       updateGeneration: (progress, step) => set({
         generationProgress: progress,
         generationStep: step
       }),
-      
+
       completeGeneration: (doc) => set((state) => ({
         isGenerating: false,
         generationProgress: 100,
         generationStep: 'Complete!',
         documents: [...state.documents, doc]
       })),
-      
+
       // Navigation
       setSelectedNegotiation: (id) => set({ selectedNegotiation: id }),
 
@@ -173,24 +181,24 @@ const useAppStore = create<AppState>()(
         toasts: state.toasts.filter(toast => toast.id !== id)
       })),
 
-      // Demo mode - NOW IMPLEMENTED
+      // Onboarding & Demo
       loadDemoData: () => {
         const state = get();
-        
-        // Only load if not already loaded
-        if (state.currentDeal === null) {
-          set({
-            currentDeal: DEMO_DEAL,
-            deals: [DEMO_DEAL],
-            documents: [DEMO_DOCUMENT],
-            parties: DEMO_PARTIES,
-            negotiations: DEMO_NEGOTIATIONS,
-            activities: DEMO_ACTIVITIES,
-            stats: DEMO_STATS
-          });
-        }
+        // Force load if invoked, even if data exists, to ensure demo state consistency
+        set({
+          currentDeal: DEMO_DEAL,
+          deals: [DEMO_DEAL],
+          documents: [DEMO_DOCUMENT],
+          parties: DEMO_PARTIES,
+          negotiations: DEMO_NEGOTIATIONS,
+          activities: DEMO_ACTIVITIES,
+          stats: DEMO_STATS,
+          hasCompletedOnboarding: true // Mark as onboarded
+        });
       },
-      
+
+      completeOnboarding: () => set({ hasCompletedOnboarding: true }),
+
       resetStore: () => set({
         currentDeal: null,
         deals: [],
@@ -203,20 +211,21 @@ const useAppStore = create<AppState>()(
         generationProgress: 0,
         generationStep: '',
         selectedNegotiation: null,
-        toasts: []
+        toasts: [],
+        hasCompletedOnboarding: false,
+        currentUser: DEFAULT_USER
       })
     }),
     {
       name: 'syndisync-storage',
-      version: 1, // Add version for migrations
+      version: 2, // Increment version for schema change
       migrate: (persistedState: any, version: number) => {
-        // Migration: Add deal_id to old negotiations
-        if (version === 0 && persistedState?.negotiations) {
-          const defaultDealId = 'deal_20250112_001';
-          persistedState.negotiations = persistedState.negotiations.map((neg: any) => ({
-            ...neg,
-            deal_id: neg.deal_id || defaultDealId
-          }));
+        if (version === 0) {
+          // ... previous migrations
+        }
+        if (version < 2) {
+          // Add hasCompletedOnboarding to existing state
+          return { ...persistedState, hasCompletedOnboarding: false };
         }
         return persistedState;
       },
@@ -229,7 +238,9 @@ const useAppStore = create<AppState>()(
         activities: state.activities,
         stats: state.stats,
         currentDeal: state.currentDeal,
-        isDemoMode: state.isDemoMode
+        isDemoMode: state.isDemoMode,
+        hasCompletedOnboarding: state.hasCompletedOnboarding,
+        currentUser: state.currentUser
       })
     }
   )

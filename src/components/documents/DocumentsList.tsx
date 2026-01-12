@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { FiDownload, FiArrowLeft, FiPlus, FiCheckCircle, FiUploadCloud, FiX, FiLoader } from 'react-icons/fi';
+import { FiDownload, FiArrowLeft, FiPlus, FiCheckCircle, FiX, FiFileText } from 'react-icons/fi';
 import { useRef, useState, useEffect } from 'react';
-import { initializeGemini, analyzeTermSheet, analyzeTermSheetImage, getApiKey } from '../../lib/gemini';
+import { downloadFacilityAgreementPDF, DEMO_DEAL_DATA } from '../../lib/pdf-generator';
 
 const TOC_SECTIONS = [
   { id: 'definitions', label: '1. Definitions' },
@@ -11,36 +11,47 @@ const TOC_SECTIONS = [
   { id: 'representations', label: '18. Representations' },
 ];
 
+import useAppStore from '../../store/appStore';
+import { formatDistanceToNow } from 'date-fns';
+
 export default function DocumentsList() {
   const navigate = useNavigate();
   const mainRef = useRef<HTMLDivElement>(null);
-  const [showUploadModal, setShowUploadModal] = useState(false);
   const [showInsight, setShowInsight] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingStatus, setProcessingStatus] = useState('');
+  const { currentDeal, documents } = useAppStore();
+
+  // Find the relevant document for the current deal
+  const currentDoc = documents.find(d => d.deal_id === currentDeal?.deal_id && d.document_type === 'facility_agreement') || documents[0];
 
   // Real Data State
   const [realData, setRealData] = useState<any>(null);
 
-  const loadAnalysisData = () => {
-    const isLive = window.localStorage.getItem('liveMode') === 'true';
-    const analysisStr = window.localStorage.getItem('current_deal_analysis');
+  useEffect(() => {
+    // If we have a current deal, use its data
+    if (currentDeal) {
+      setRealData({
+        borrower: currentDeal.borrower.name,
+        amount: currentDeal.facility_amount,
+        leverage: '4.50:1.00', // Could be derived if we had specific covenant fields
+        margin: 'SOFR + 3.25%',
+        summary: `Facility Agreement for ${currentDeal.borrower.name} financing.`
+      });
+    } else {
+      // Fallback to local storage or defaults
+      const isLive = window.localStorage.getItem('liveMode') === 'true';
+      const analysisStr = window.localStorage.getItem('current_deal_analysis');
 
-    if (isLive && analysisStr) {
-      try {
-        // Attempt to clean JSON if Gemini added backticks
-        const cleanJson = analysisStr.replace(/```json/g, '').replace(/```/g, '');
-        setRealData(JSON.parse(cleanJson));
-        setShowInsight(true); // Show the insight panel with new data
-      } catch (e) {
-        console.error("Failed to parse analysis", e);
+      if (isLive && analysisStr) {
+        try {
+          const cleanJson = analysisStr.replace(/```json/g, '').replace(/```/g, '');
+          setRealData(JSON.parse(cleanJson));
+          setShowInsight(true);
+        } catch (e) {
+          console.error("Failed to parse analysis", e);
+        }
       }
     }
-  };
-
-  useEffect(() => {
-    loadAnalysisData();
-  }, []);
+  }, [currentDeal]);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -49,75 +60,8 @@ export default function DocumentsList() {
     }
   };
 
-  const handleFileUpload = async (file: File) => {
-    const isLive = window.localStorage.getItem('liveMode') === 'true';
-
-    if (!isLive) {
-      // Demo mode: just close modal and show success
-      setShowUploadModal(false);
-      alert('Demo mode: Toggle "Live AI Mode" to process real documents.');
-      return;
-    }
-
-    const apiKey = getApiKey();
-    if (!apiKey) {
-      alert('Please enter your Gemini API key in the sidebar.');
-      return;
-    }
-
-    setIsProcessing(true);
-    setProcessingStatus('Initializing AI...');
-
-    try {
-      initializeGemini(apiKey);
-
-      if (file.type.startsWith('image/')) {
-        // Handle image files with vision
-        setProcessingStatus('Scanning document with AI Vision...');
-        const reader = new FileReader();
-
-        const result = await new Promise<string>((resolve, reject) => {
-          reader.onload = async (ev) => {
-            try {
-              const base64String = ev.target?.result as string;
-              const base64Data = base64String.split(',')[1];
-              const analysis = await analyzeTermSheetImage(base64Data, file.type);
-              resolve(analysis);
-            } catch (e) {
-              reject(e);
-            }
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-
-        window.localStorage.setItem('current_deal_analysis', result);
-      } else {
-        // Handle text files
-        setProcessingStatus('Analyzing term sheet...');
-        const text = await file.text();
-        const analysis = await analyzeTermSheet(text);
-        window.localStorage.setItem('current_deal_analysis', analysis);
-      }
-
-      setProcessingStatus('Complete!');
-
-      // Reload the analysis data to update the UI
-      loadAnalysisData();
-
-      // Close modal after short delay
-      setTimeout(() => {
-        setIsProcessing(false);
-        setShowUploadModal(false);
-        setProcessingStatus('');
-      }, 1000);
-
-    } catch (error) {
-      console.error('File processing error:', error);
-      alert('Error processing file: ' + error);
-      setIsProcessing(false);
-      setProcessingStatus('');
-    }
+  const handleGenerateNew = () => {
+    navigate('/generate');
   };
 
   return (
@@ -133,13 +77,21 @@ export default function DocumentsList() {
               {realData ? `${realData.borrower} - Facility Agreement` : 'Acme Corp LBO - Facility Agreement'}
               <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/20 text-green-400 border border-green-500/30">LMA Compliant</span>
             </h1>
-            <p className="text-xs text-slate-400">Generated {realData ? 'Just now' : '43s ago'} • v1.0 • 287 pages</p>
+            <p className="text-xs text-slate-400">
+              Generated {currentDoc ? formatDistanceToNow(new Date(currentDoc.created_at), { addSuffix: true }) : 'Just now'} • v1.0 • 287 pages
+            </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <button onClick={() => setShowUploadModal(true)} className="glass-button px-4 py-2 rounded-lg flex items-center gap-2 text-sm hover:bg-gold-500/20 hover:border-gold-500/50 transition-all">
+          <button onClick={handleGenerateNew} className="glass-button px-4 py-2 rounded-lg flex items-center gap-2 text-sm hover:bg-gold-500/20 hover:border-gold-500/50 transition-all">
             <FiPlus /> Generate New
+          </button>
+          <button
+            onClick={() => downloadFacilityAgreementPDF(DEMO_DEAL_DATA)}
+            className="glass-button px-4 py-2 rounded-lg flex items-center gap-2 text-sm hover:bg-red-500/20 hover:border-red-500/50 transition-all"
+          >
+            <FiFileText /> Download PDF
           </button>
           <button className="bg-primary-600 hover:bg-primary-500 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-medium shadow-glow transition-all">
             <FiDownload /> Download Word
@@ -186,25 +138,25 @@ export default function DocumentsList() {
         {/* Main Document View */}
         <div ref={mainRef} className="flex-1 bg-navy-950 overflow-y-auto p-8 relative">
 
-          {/* Floating AI Insight */}
+          {/* Floating AI Insight - Fixed positioning to not overlap document */}
           {showInsight && (
-            <div className="absolute top-8 right-8 w-80 p-4 rounded-xl border-l-4 border-gold-500 animate-slide-in-right z-20 shadow-2xl bg-gold-400 text-navy-900">
+            <div className="fixed bottom-24 right-8 w-80 p-4 rounded-xl border-l-4 border-gold-500 animate-slide-in-right z-30 shadow-2xl bg-gradient-to-br from-gold-400 to-gold-500 text-navy-900 transform transition-all duration-300 hover:scale-[1.02]">
               {/* Close button */}
               <button
                 onClick={() => setShowInsight(false)}
-                className="absolute top-2 right-2 p-1 hover:bg-navy-900/20 rounded-full transition-colors"
+                className="absolute top-2 right-2 p-1.5 hover:bg-navy-900/20 rounded-full transition-colors"
                 title="Close insight"
               >
-                <FiX size={16} />
+                <FiX size={14} />
               </button>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-navy-900 animate-pulse"></div>
-                <span className="text-xs font-bold text-navy-900 uppercase">AI Insight</span>
+                <span className="text-xs font-bold text-navy-900 uppercase tracking-wider">AI Insight</span>
               </div>
-              <p className="text-sm font-semibold text-navy-900 mb-2">
+              <p className="text-sm font-semibold text-navy-900 mb-2 leading-snug">
                 {realData?.summary || "Financial Covenants automatically aligned with Q4 2025 mid-market LBO precedents."}
               </p>
-              <p className="text-xs text-navy-700">
+              <p className="text-xs text-navy-700/80">
                 {realData ? "Based on real-time analysis of uploaded term sheet." : "Based on analysis of 147 comparable transactions."}
               </p>
             </div>
@@ -215,10 +167,10 @@ export default function DocumentsList() {
             {/* Cover */}
             <div className="text-center mb-16 pb-16 border-b-2 border-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-slate-500 mb-6">Dated 2 January 2026</p>
-              <h1 className="text-4xl font-bold uppercase mb-2 text-slate-900">Topco Limited</h1>
+              <h1 className="text-4xl font-bold uppercase mb-2 text-slate-900">{realData?.borrower || 'Topco Limited'}</h1>
               <p className="text-lg text-slate-600 mb-6">as Parent</p>
               <h2 className="text-2xl font-bold uppercase mt-8 text-slate-800">Senior Facilities Agreement</h2>
-              <p className="mt-4 text-xl font-semibold text-slate-700">USD 450,000,000</p>
+              <p className="mt-4 text-xl font-semibold text-slate-700">USD {(realData?.amount || 450000000).toLocaleString()}</p>
               <p className="mt-8 text-sm text-slate-500">Arranged by J.P. Morgan Securities LLC</p>
             </div>
 
@@ -242,8 +194,8 @@ export default function DocumentsList() {
               <p className="font-bold mb-4">2.1 The Facilities</p>
               <p className="mb-4 text-sm">Subject to the terms hereof, the Lenders agree to make available to the Borrowers:</p>
               <ol className="list-decimal pl-8 space-y-2 text-sm">
-                <li>A term loan facility in an aggregate amount of <span className="font-bold">USD 350,000,000</span> (the "Term Facility").</li>
-                <li>A revolving credit facility in an aggregate amount of <span className="font-bold">USD 100,000,000</span> (the "Revolving Facility").</li>
+                <li>A term loan facility in an aggregate amount of <span className="font-bold">USD {((realData?.amount || 450000000) * 0.75).toLocaleString()}</span> (the "Term Facility").</li>
+                <li>A revolving credit facility in an aggregate amount of <span className="font-bold">USD {((realData?.amount || 450000000) * 0.25).toLocaleString()}</span> (the "Revolving Facility").</li>
               </ol>
             </section>
 
@@ -296,51 +248,6 @@ export default function DocumentsList() {
           </div>
         </div>
       </div>
-
-      {/* Upload Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/80 backdrop-blur-sm animate-fade-in" onClick={() => !isProcessing && setShowUploadModal(false)}>
-          <div
-            className="glass-card p-12 rounded-2xl max-w-2xl w-full text-center border-2 border-dashed border-white/20 hover:border-gold-500/50 transition-colors cursor-pointer group"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (!isProcessing) {
-                document.getElementById('doc-file-upload-input')?.click();
-              }
-            }}
-          >
-            <input
-              type="file"
-              id="doc-file-upload-input"
-              className="hidden"
-              accept=".pdf,image/*,.txt"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleFileUpload(file);
-                }
-              }}
-            />
-            {isProcessing ? (
-              <>
-                <div className="w-20 h-20 mx-auto rounded-full bg-navy-800 flex items-center justify-center text-gold-500 mb-6">
-                  <FiLoader size={40} className="animate-spin" />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">{processingStatus}</h3>
-                <p className="text-slate-400">Please wait...</p>
-              </>
-            ) : (
-              <>
-                <div className="w-20 h-20 mx-auto rounded-full bg-navy-800 flex items-center justify-center text-slate-400 group-hover:text-gold-500 group-hover:scale-110 transition-all mb-6">
-                  <FiUploadCloud size={40} />
-                </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Upload New Term Sheet</h3>
-                <p className="text-slate-400">Click to browse local files or drag & drop</p>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

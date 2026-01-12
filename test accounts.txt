@@ -1,0 +1,9 @@
+Account	Email	Password	Role	Access
+Admin	moh.admin@test.irs.com	TestPass123!	super_admin	/dashboard (full)
+Staff	moh.staff@test.irs.com	TestPass123!	management	/dashboard
+Client	moh.client@test.irs.com	TestPass123!	client	/portal
+
+npm run generate-qr IRS-CEO-001           # Single
+npm run generate-qr:all                   # All employees
+
+

@@ -1,36 +1,77 @@
-import { FiTrendingUp, FiAward, FiGlobe, FiFileText, FiCheckCircle } from 'react-icons/fi';
+import { useState } from 'react';
+import { FiTrendingUp, FiAward, FiGlobe, FiFileText, FiCheckCircle, FiInfo } from 'react-icons/fi';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from 'recharts';
-
-const ESG_DATA = [
-  { name: 'Environmental', value: 95, color: '#10b981' }, // Green
-  { name: 'Social', value: 88, color: '#3b82f6' }, // Blue
-  { name: 'Governance', value: 93, color: '#8b5cf6' }, // Purple
-];
-
-const IMPACT_METRICS = [
-  { label: 'Carbon Offset', value: '450', unit: 'tons CO2', icon: FiGlobe, color: 'text-green-400' },
-  { label: 'SLLP Score', value: '92', unit: '/ 100', icon: FiAward, color: 'text-gold-400' },
-  { label: 'Rate Reduction', value: '5.5', unit: 'bps', icon: FiTrendingUp, color: 'text-primary-400' },
-];
+import { motion } from 'framer-motion';
+import ESGMethodologyModal from './ESGMethodologyModal';
+import { MARKET_STATS } from '../../data/comparable-deals';
+import { staggerContainer, staggerItem } from '../common/PageTransition';
+import useAppStore from '../../store/appStore';
 
 export function Analytics() {
+  const [showMethodology, setShowMethodology] = useState(false);
+  const { currentDeal } = useAppStore();
+
+  // Default values or derived from currentDeal
+  const esgScore = currentDeal?.esg_score || 95;
+  const carbonOffset = currentDeal?.carbon_offset_tons || 450;
+  // Mock logic for other values if not in deal model yet
+  const governanceScore = esgScore - 2;
+  const socialScore = esgScore - 7;
+
+  const ESG_DATA = [
+    { name: 'Environmental', value: esgScore, color: '#10b981' }, // Green
+    { name: 'Social', value: socialScore, color: '#3b82f6' }, // Blue
+    { name: 'Governance', value: governanceScore, color: '#8b5cf6' }, // Purple
+  ];
+
+  const IMPACT_METRICS = [
+    { label: 'Carbon Offset', value: carbonOffset.toString(), unit: 'tons CO2', icon: FiGlobe, color: 'text-green-400' },
+    { label: 'SLLP Score', value: esgScore.toString(), unit: '/ 100', icon: FiAward, color: 'text-gold-400' },
+    { label: 'Rate Reduction', value: '5.5', unit: 'bps', icon: FiTrendingUp, color: 'text-primary-400' },
+  ];
+
   return (
     <div className="p-8 space-y-8 bg-navy-900 min-h-screen text-slate-100">
-      <div className="flex justify-between items-center mb-8 animate-slide-up">
+      <motion.div
+        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Greener Lending Intelligence</h1>
-          <p className="text-slate-400">Sustainability-Linked Loan Principles (SLLP) Compliance</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Greener Lending Intelligence</h1>
+          <p className="text-slate-400 text-sm md:text-base">Sustainability-Linked Loan Principles (SLLP) Compliance</p>
         </div>
-        <div className="glass-card px-6 py-3 rounded-xl flex items-center gap-3 border border-green-500/30">
-          <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-          <span className="font-bold text-green-400">SLLP Certified Deal</span>
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+          <button
+            onClick={() => setShowMethodology(true)}
+            className="flex items-center gap-2 px-3 md:px-4 py-2 bg-green-500/20 text-green-400 rounded-full border border-green-500/30 hover:bg-green-500/30 transition-colors text-sm md:text-base"
+          >
+            <FiInfo />
+            <span className="font-semibold">View Methodology</span>
+          </button>
+          <div className="glass-card px-4 md:px-6 py-2 md:py-3 rounded-xl flex items-center gap-2 md:gap-3 border border-green-500/30">
+            <div className="w-2 md:w-3 h-2 md:h-3 rounded-full bg-green-500 animate-pulse"></div>
+            <span className="font-bold text-green-400 text-sm md:text-base">SLLP Certified</span>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Top Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-50px" }}
+      >
         {IMPACT_METRICS.map((metric, i) => (
-          <div key={i} className="glass-card p-6 rounded-2xl flex items-center gap-6">
+          <motion.div
+            key={i}
+            variants={staggerItem}
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            className="glass-card p-6 rounded-2xl flex items-center gap-6"
+          >
             <div className={`w-16 h-16 rounded-full bg-navy-800 flex items-center justify-center text-2xl ${metric.color} shadow-glow`}>
               <metric.icon />
             </div>
@@ -41,22 +82,38 @@ export function Analytics() {
                 <span className="text-sm text-slate-500 font-medium">{metric.unit}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Main Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-50px" }}
+      >
 
         {/* ESG Breakdown Chart */}
-        <div className="glass-card p-8 rounded-2xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <motion.div
+          className="glass-card p-8 rounded-2xl"
+          variants={staggerItem}
+        >
           <h3 className="text-xl font-bold text-white mb-6">ESG Performance Breakdown</h3>
           <div className="h-64 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ESG_DATA} layout="vertical" margin={{ left: 40 }}>
                 <XAxis type="number" domain={[0, 100]} hide />
                 <YAxis dataKey="name" type="category" stroke="#fff" width={100} />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={32}>
+                <Bar
+                  dataKey="value"
+                  radius={[0, 4, 4, 0]}
+                  barSize={32}
+                  animationDuration={1500}
+                  animationBegin={300}
+                  animationEasing="ease-out"
+                >
                   {ESG_DATA.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
@@ -64,10 +121,13 @@ export function Analytics() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Live Document Integration */}
-        <div className="glass-card p-8 rounded-2xl animate-slide-up border-l-4 border-green-500 bg-gradient-to-br from-navy-800 to-green-900/10" style={{ animationDelay: '0.3s' }}>
+        <motion.div
+          className="glass-card p-8 rounded-2xl border-l-4 border-green-500 bg-gradient-to-br from-navy-800 to-green-900/10"
+          variants={staggerItem}
+        >
           <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
             <FiFileText /> Live Clause Integration
           </h3>
@@ -89,19 +149,28 @@ export function Analytics() {
               Auto-inserted based on ESG Score &gt; 90
             </div>
           </div>
-        </div>
+        </motion.div>
 
-      </div>
+      </motion.div>
 
       {/* UN SDG Alignment Section - NEW WOW FACTOR */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+      <motion.div
+        className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-50px" }}
+      >
         {/* UN SDG Badges */}
-        <div className="glass-card p-8 rounded-2xl animate-slide-up" style={{ animationDelay: '0.35s' }}>
+        <motion.div
+          className="glass-card p-8 rounded-2xl"
+          variants={staggerItem}
+        >
           <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
             🌍 UN Sustainable Development Goals Alignment
           </h3>
           <p className="text-slate-400 text-sm mb-6">This deal contributes to 4 of the 17 UN SDGs</p>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { num: 7, name: 'Affordable Clean Energy', color: 'bg-yellow-500' },
               { num: 9, name: 'Industry, Innovation', color: 'bg-orange-500' },
@@ -122,10 +191,13 @@ export function Analytics() {
             <FiCheckCircle />
             <span>SDG Impact Report generated automatically</span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Green Bond Eligibility */}
-        <div className="glass-card p-8 rounded-2xl animate-slide-up bg-gradient-to-br from-navy-800 to-green-900/20 border border-green-500/20" style={{ animationDelay: '0.4s' }}>
+        <motion.div
+          className="glass-card p-8 rounded-2xl bg-gradient-to-br from-navy-800 to-green-900/20 border border-green-500/20"
+          variants={staggerItem}
+        >
           <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
             🌱 Green Bond Eligibility
           </h3>
@@ -134,15 +206,16 @@ export function Analytics() {
               {/* Animated ring gauge */}
               <svg className="w-24 h-24 transform -rotate-90">
                 <circle cx="48" cy="48" r="40" stroke="#1e3a5f" strokeWidth="8" fill="none" />
-                <circle
+                <motion.circle
                   cx="48" cy="48" r="40"
                   stroke="#10b981"
                   strokeWidth="8"
                   fill="none"
                   strokeLinecap="round"
                   strokeDasharray="251.2"
-                  strokeDashoffset="25.12"
-                  className="transition-all duration-1000"
+                  strokeDashoffset="251.2" // Start empty
+                  animate={{ strokeDashoffset: 25.12 }} // 90%
+                  transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }}
                 />
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
@@ -173,30 +246,42 @@ export function Analytics() {
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Covenant Benchmarking Section */}
-      <div className="glass-card p-8 rounded-2xl animate-slide-up mt-8" style={{ animationDelay: '0.4s' }}>
+      <motion.div
+        className="glass-card p-8 rounded-2xl mt-8"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+      >
         <h3 className="text-xl font-bold text-white mb-2">Leverage Covenant Benchmarking</h3>
-        <p className="text-slate-400 text-sm mb-6">Your deal vs. 147 comparable manufacturing LBOs (Q4 2025)</p>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <p className="text-slate-400 text-sm mb-6">Your deal vs. {MARKET_STATS.sample_size} comparable manufacturing LBOs (Q3 2023 - Q4 2024)</p>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={[
-                { range: '25th %ile', value: 4.25, color: '#334155' },
-                { range: 'Median', value: 5.1, color: '#334155' },
-                { range: '75th %ile', value: 5.75, color: '#334155' },
+                { range: '25th %ile', value: MARKET_STATS.leverage.p25, color: '#334155' },
+                { range: 'Median', value: MARKET_STATS.leverage.median, color: '#334155' },
+                { range: '75th %ile', value: MARKET_STATS.leverage.p75, color: '#334155' },
                 { range: 'Your Deal', value: 5.0, color: '#cca43b' },
               ]}>
                 <XAxis dataKey="range" stroke="#94a3b8" />
                 <YAxis domain={[3.5, 6.5]} stroke="#94a3b8" />
                 <Tooltip contentStyle={{ backgroundColor: '#112240', border: '1px solid rgba(255,255,255,0.1)' }} itemStyle={{ color: '#fff' }} />
-                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                <Bar
+                  dataKey="value"
+                  radius={[4, 4, 0, 0]}
+                  animationDuration={1200}
+                  animationBegin={400}
+                  animationEasing="ease-out"
+                >
                   {[
-                    { range: '25th %ile', value: 4.25, color: '#334155' },
-                    { range: 'Median', value: 5.1, color: '#334155' },
-                    { range: '75th %ile', value: 5.75, color: '#334155' },
+                    { range: '25th %ile', value: MARKET_STATS.leverage.p25, color: '#334155' },
+                    { range: 'Median', value: MARKET_STATS.leverage.median, color: '#334155' },
+                    { range: '75th %ile', value: MARKET_STATS.leverage.p75, color: '#334155' },
                     { range: 'Your Deal', value: 5.0, color: '#cca43b' },
                   ].map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -207,8 +292,8 @@ export function Analytics() {
           </div>
           <div className="space-y-4">
             <div className="p-4 rounded-xl bg-navy-800 border border-white/5">
-              <p className="text-slate-400 text-sm mb-1">Market Median</p>
-              <p className="text-3xl font-bold text-white">5.10x</p>
+              <p className="text-slate-400 text-sm mb-1">Market Median ({MARKET_STATS.sample_size} deals)</p>
+              <p className="text-3xl font-bold text-white">{MARKET_STATS.leverage.median}x</p>
             </div>
             <div className="p-4 rounded-xl bg-gold-500/10 border border-gold-500/30">
               <p className="text-gold-400 text-sm mb-1">Your Deal Position</p>
@@ -217,8 +302,13 @@ export function Analytics() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
+
+      {/* ESG Methodology Modal */}
+      <ESGMethodologyModal
+        isOpen={showMethodology}
+        onClose={() => setShowMethodology(false)}
+      />
     </div>
   );
 }
-

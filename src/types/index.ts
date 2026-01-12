@@ -116,6 +116,48 @@ export interface Document {
     optional_provisions_included: number;
     compliance_score: number;
   };
+  // AI-extracted deal data for PDF generation
+  extracted_data?: {
+    borrower: {
+      name: string;
+      industry: string;
+      headquarters: string;
+      credit_rating: string;
+      annual_revenue: number;
+      employees: number;
+    };
+    facility: {
+      amount: number;
+      currency: string;
+      type: string;
+      tenor_months: number;
+      purpose: string;
+    };
+    covenants: {
+      leverage_ratio: number;
+      interest_coverage: number;
+      capex_limit: number;
+      debt_incurrence_test: string;
+    };
+    parties: Array<{
+      name: string;
+      role: string;
+      commitment: number;
+    }>;
+    pricing: {
+      base_rate: string;
+      margin_bps: number;
+      commitment_fee_bps: number;
+      upfront_fee_bps: number;
+    };
+    esg: {
+      sustainability_linked: boolean;
+      green_use_of_proceeds: boolean;
+      esg_kpis: string[];
+      margin_adjustment_bps: number;
+    };
+    jurisdiction: string;
+  };
 }
 
 export interface DocumentSection {

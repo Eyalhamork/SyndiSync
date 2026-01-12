@@ -11,36 +11,25 @@ interface LiveNotification {
     message?: string;
 }
 
+// Reduced to 3 strategic notifications, well-spaced for clean demo flow
 const LIVE_NOTIFICATIONS: LiveNotification[] = [
     {
-        delay: 8000,
+        delay: 12000, // 12s - First impression of collaboration
         type: 'info',
         title: 'Sarah Chen commented',
         message: 'New comment on Section 7.1 - Financial Covenants'
     },
     {
-        delay: 18000,
+        delay: 35000, // 35s - Show resolution happening
         type: 'success',
         title: 'Wells Fargo accepted proposal',
         message: 'Leverage covenant compromise approved'
     },
     {
-        delay: 30000,
-        type: 'info',
-        title: 'Document revision ready',
-        message: 'TechCorp Facility Agreement v2 generated'
-    },
-    {
-        delay: 45000,
+        delay: 55000, // 55s - ESG update
         type: 'success',
-        title: 'AI Analysis complete',
-        message: 'ESG compliance score updated to 94/100'
-    },
-    {
-        delay: 60000,
-        type: 'info',
-        title: 'JP Morgan reviewing',
-        message: 'Section 8.3 - Restricted Payments under review'
+        title: 'ESG Score Updated',
+        message: 'Portfolio sustainability score now 94/100'
     }
 ];
 
