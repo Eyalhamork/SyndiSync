@@ -15,53 +15,48 @@ import {
 } from '@heroicons/react/24/outline';
 import { SparklesIcon } from '@heroicons/react/24/solid';
 import useAppStore from '../../store/appStore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { staggerContainer, staggerItem } from '../common/PageTransition';
+import { useMotionValue, useSpring, useInView } from 'framer-motion';
 
 // Animated counter for hero stats
+// Animated counter for hero stats - Optimized to prevent re-renders
 function AnimatedStatNumber({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
-  const [displayValue, setDisplayValue] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { damping: 30, stiffness: 100 });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   useEffect(() => {
-    const duration = 2000;
-    const startTime = Date.now();
-    const endValue = value;
+    if (isInView) {
+      motionValue.set(value);
+    }
+  }, [isInView, value, motionValue]);
 
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Easing function
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayValue(Math.floor(eased * endValue));
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        setDisplayValue(endValue);
+  useEffect(() => {
+    return springValue.on("change", (latest) => {
+      if (ref.current) {
+        // Build the string directly in the DOM node
+        ref.current.textContent = `${prefix}${Math.floor(latest).toLocaleString()}${suffix}`;
       }
-    };
+    });
+  }, [springValue, prefix, suffix]);
 
-    const timer = setTimeout(() => {
-      requestAnimationFrame(animate);
-    }, 500); // Delay start
-
-    return () => clearTimeout(timer);
-  }, [value]);
-
-  return <span>{prefix}{displayValue.toLocaleString()}{suffix}</span>;
+  return <span ref={ref} className="tabular-nums">{prefix}0{suffix}</span>;
 }
 
 // Floating particles component
 function FloatingParticles() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(15)].map((_, i) => (
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 rounded-full bg-gold-400/30"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
+            willChange: 'transform, opacity'
           }}
           animate={{
             y: [0, -30, 0],
@@ -153,54 +148,58 @@ export default function LandingPage() {
       {/* Enhanced Animated Background Elements */}
       <div className="fixed inset-0 z-0 mesh-gradient">
         <motion.div
-          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent-purple/20 rounded-full blur-[120px]"
+          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-accent-purple/20 rounded-full blur-[100px]"
+          style={{ willChange: 'transform' }}
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-            x: [0, 30, 0],
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.4, 0.3],
+            x: [0, 20, 0],
           }}
           transition={{
-            duration: 10,
+            duration: 15,
             repeat: Infinity,
-            ease: 'easeInOut'
+            ease: 'linear'
           }}
         />
         <motion.div
-          className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-accent-cyan/15 rounded-full blur-[100px]"
+          className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-accent-cyan/15 rounded-full blur-[80px]"
+          style={{ willChange: 'transform' }}
           animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2
-          }}
-        />
-        <motion.div
-          className="absolute bottom-[-10%] right-[20%] w-[45%] h-[45%] bg-gold-600/10 rounded-full blur-[120px]"
-          animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: [0.3, 0.5, 0.3],
+            scale: [1.05, 1, 1.05],
+            opacity: [0.2, 0.3, 0.2],
           }}
           transition={{
             duration: 12,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: 'linear',
+            delay: 2
+          }}
+        />
+        <motion.div
+          className="absolute bottom-[-10%] right-[20%] w-[45%] h-[45%] bg-gold-600/10 rounded-full blur-[100px]"
+          style={{ willChange: 'transform' }}
+          animate={{
+            scale: [1.05, 1, 1.05],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: 'linear',
             delay: 1
           }}
         />
         <motion.div
-          className="absolute bottom-[30%] left-[-5%] w-[30%] h-[30%] bg-accent-rose/10 rounded-full blur-[80px]"
+          className="absolute bottom-[30%] left-[-5%] w-[30%] h-[30%] bg-accent-rose/10 rounded-full blur-[60px]"
+          style={{ willChange: 'transform' }}
           animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.35, 0.2],
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.3, 0.2],
           }}
           transition={{
-            duration: 9,
+            duration: 14,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: 'linear',
             delay: 3
           }}
         />
@@ -209,7 +208,7 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-navy-950/80 backdrop-blur-xl border-b border-white/5 z-50">
+      <nav className="fixed top-0 left-0 right-0 bg-navy-950/80 backdrop-blur-md border-b border-white/5 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <motion.div
             className="flex items-center gap-3"
@@ -262,10 +261,10 @@ export default function LandingPage() {
           <motion.span
             className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 via-gold-500 to-gold-300 bg-[length:200%_100%]"
             animate={{
-              backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              backgroundPosition: ['0% 50%', '100% 50%'],
             }}
             transition={{
-              duration: 5,
+              duration: 8,
               repeat: Infinity,
               ease: 'linear'
             }}
