@@ -183,7 +183,6 @@ const useAppStore = create<AppState>()(
 
       // Onboarding & Demo
       loadDemoData: () => {
-        const state = get();
         // Force load if invoked, even if data exists, to ensure demo state consistency
         set({
           currentDeal: DEMO_DEAL,

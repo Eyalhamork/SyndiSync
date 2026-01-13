@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { FiBriefcase, FiUser, FiArrowRight, FiUpload, FiPlay } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../../store/appStore';
 import { SparklesIcon } from '@heroicons/react/24/solid';
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
         opacity: 1,
@@ -15,7 +15,7 @@ const containerVariants = {
     exit: { opacity: 0, transition: { duration: 0.3 } }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };

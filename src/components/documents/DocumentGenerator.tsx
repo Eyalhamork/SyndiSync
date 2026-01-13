@@ -13,8 +13,7 @@ import {
   CpuChipIcon,
   DocumentTextIcon,
   ArrowLeftIcon,
-  CheckIcon,
-  SparklesIcon
+  CheckIcon
 } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
