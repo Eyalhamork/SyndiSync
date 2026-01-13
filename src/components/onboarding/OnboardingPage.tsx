@@ -166,15 +166,15 @@ export default function OnboardingPage() {
                                     transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
                                 />
                                 <motion.div
-                                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-gold-400 to-gold-600 opacity-30"
+                                    className="absolute inset-0 rounded-2xl bg-gradient-to-r from-gold-600 to-gold-800 opacity-30"
                                     animate={{
                                         scale: [1.2, 1.6, 1.2],
                                         opacity: [0.3, 0.05, 0.3],
                                     }}
                                     transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
                                 />
-                                <div className="relative w-full h-full bg-gradient-to-br from-gold-300 via-gold-500 to-gold-600 rounded-2xl flex items-center justify-center shadow-glow-gold">
-                                    <span className="text-5xl font-bold text-navy-900">S</span>
+                                <div className="relative w-full h-full bg-gradient-to-br from-gold-500 via-gold-600 to-gold-800 rounded-2xl flex items-center justify-center shadow-glow-gold">
+                                    <img src="/logo.png" alt="SyndiSync" className="h-16 w-16 object-contain" />
                                 </div>
                             </div>
                             <motion.h1

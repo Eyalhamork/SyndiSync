@@ -19,6 +19,8 @@ export default {
           400: '#f6d365', // Highlights
           500: '#cca43b', // Primary metallic
           600: '#b48a28',
+          700: '#926f21',
+          800: '#73561a',
         },
         primary: {
           ...require('tailwindcss/colors').blue, // Fallback

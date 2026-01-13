@@ -25,8 +25,8 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
       {/* Logo */}
       <div className="flex items-center flex-shrink-0 px-6 py-8">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 bg-gradient-to-br from-gold-400 to-gold-600 rounded-lg flex items-center justify-center shadow-glow">
-            <span className="text-navy-900 font-bold text-xl">S</span>
+          <div className="h-10 w-10 bg-gradient-to-br from-gold-600 to-gold-800 rounded-lg flex items-center justify-center shadow-glow">
+            <img src="/logo.png" alt="SyndiSync" className="h-8 w-8 object-contain" />
           </div>
           <div>
             <h1 className="text-white text-xl font-bold tracking-tight">SyndiSync</h1>

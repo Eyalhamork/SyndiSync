@@ -217,8 +217,8 @@ export default function LandingPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="h-11 w-11 bg-gradient-to-br from-gold-300 via-gold-500 to-gold-600 rounded-xl flex items-center justify-center shadow-glow-gold">
-              <span className="text-navy-900 font-bold text-xl">S</span>
+            <div className="h-11 w-11 bg-gradient-to-br from-gold-500 via-gold-600 to-gold-800 rounded-xl flex items-center justify-center shadow-glow-gold">
+              <img src="/logo.png" alt="SyndiSync" className="h-8 w-8 object-contain" />
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight">SyndiSync AI</h1>
