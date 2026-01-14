@@ -37,12 +37,43 @@ function TypewriterMessage({ content, onComplete }: { content: string, onComplet
 }
 
 export function AIAssistant() {
-    const { isAIChatOpen, toggleAIChat } = useAppStore();
+    const { isAIChatOpen, toggleAIChat, currentDeal, negotiations, parties, documents } = useAppStore();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    // Helper to format currency
+    const formatCurrency = (amount: number) => {
+        if (amount >= 1000000000) return `$${(amount / 1000000000).toFixed(1)}B`;
+        if (amount >= 1000000) return `$${(amount / 1000000).toFixed(0)}M`;
+        return `$${amount.toLocaleString()}`;
+    };
+
+    // Get current deal context for AI
+    const getDealContext = () => {
+        if (!currentDeal) {
+            return {
+                deal_name: 'No active deal',
+                borrower: { name: 'N/A', industry: 'N/A' },
+                facility_amount: 0,
+                deal_type: 'LBO',
+                status: 'draft',
+                leverage_ratio: 5.0,
+                esg_score: 0
+            };
+        }
+        return {
+            deal_name: currentDeal.deal_name,
+            borrower: { name: currentDeal.borrower.name, industry: currentDeal.borrower.industry },
+            facility_amount: currentDeal.facility_amount,
+            deal_type: currentDeal.deal_type,
+            status: currentDeal.status,
+            leverage_ratio: 5.0, // Could be extracted from negotiations
+            esg_score: currentDeal.esg_score || 0
+        };
+    };
 
     // Auto-scroll to bottom on new messages
     useEffect(() => {
@@ -81,15 +112,7 @@ export function AIAssistant() {
                 initializeGemini(apiKey);
             }
 
-            const text = await chatbotQuery(userMessage.content, {
-                deal_name: 'TechCorp LBO Financing',
-                borrower: { name: 'TechCorp Industries Inc.', industry: 'Manufacturing - Industrial Technology' },
-                facility_amount: 450000000,
-                deal_type: 'LBO',
-                status: 'under_negotiation',
-                leverage_ratio: 5.0,
-                esg_score: 92
-            });
+            const text = await chatbotQuery(userMessage.content, getDealContext());
 
             const assistantMessage: Message = {
                 id: `msg_${Date.now()} `,
@@ -110,20 +133,44 @@ export function AIAssistant() {
         const q = question.toLowerCase();
         let response = '';
 
+        // Get dynamic deal info
+        const dealName = currentDeal?.deal_name || 'your current deal';
+        const borrowerName = currentDeal?.borrower?.name || 'the borrower';
+        const facilityAmount = currentDeal ? formatCurrency(currentDeal.facility_amount) : '$0';
+        const dealType = currentDeal?.deal_type || 'LBO';
+        const esgScore = currentDeal?.esg_score || 92;
+        const industry = currentDeal?.borrower?.industry || 'the industry';
+
+        // Build syndicate table from parties
+        const syndicateTable = parties.length > 0
+            ? parties.map(p => `| ${p.name} | ${p.role} | ${formatCurrency(p.commitment)} |`).join('\n')
+            : '| Global Investment Bank | Arranger | $150M |\n| JP Morgan Chase | Co-Lead | $100M |\n| Bank of America | Member | $75M |\n| Citibank | Member | $75M |\n| Wells Fargo | Member | $50M |';
+
+        // Get leverage negotiation info
+        const leverageNeg = negotiations.find(n => n.clause_reference.toLowerCase().includes('leverage'));
+
         if (q.includes('leverage') || q.includes('covenant')) {
-            response = `The current leverage covenant under negotiation is at **5.0x** with a proposed step-down to **4.75x** in Year 3. Bank of America prefers 4.5x (conservative), while JP Morgan supports 5.5x (flexible). Based on ${MARKET_STATS.sample_size} comparable deals, the market median is **${MARKET_STATS.leverage.median}x**. My recommendation has an **85% predicted acceptance rate**.`;
+            if (leverageNeg) {
+                const positions = leverageNeg.positions.map(p => `${p.party}: ${p.position}`).join(', ');
+                response = `**${dealName} - Leverage Covenant Status:**\n\n${leverageNeg.conflict_description}\n\n**Bank Positions:** ${positions}\n\nBased on ${MARKET_STATS.sample_size} comparable ${dealType} deals, the market median is **${MARKET_STATS.leverage.median}x**. My recommendation has an **85% predicted acceptance rate**.`;
+            } else {
+                response = `The current leverage covenant under negotiation is at **5.0x** with a proposed step-down to **4.75x** in Year 3. Based on ${MARKET_STATS.sample_size} comparable deals, the market median is **${MARKET_STATS.leverage.median}x**. My recommendation has an **85% predicted acceptance rate**.`;
+            }
         } else if (q.includes('risk')) {
-            response = "**Key Deal Risks:**\n\n1. **Covenant Misalignment** - 5 banks have conflicting leverage preferences (4.5x-5.5x range)\n2. **Interest Rate Exposure** - SOFR-based pricing in volatile rate environment\n3. **Sector Headwinds** - Manufacturing facing supply chain pressures\n4. **Execution Timeline** - Target close in 72 hours is aggressive\n\nMitigation: The proposed equity cure rights (2x) provide flexibility without weakening credit protection.";
+            response = `**Key Deal Risks for ${dealName}:**\n\n1. **Covenant Misalignment** - ${parties.length || 5} banks have conflicting leverage preferences\n2. **Interest Rate Exposure** - SOFR-based pricing in volatile rate environment\n3. **Sector Headwinds** - ${industry} facing market pressures\n4. **Execution Timeline** - Target close in 72 hours is aggressive\n\nMitigation: The proposed equity cure rights (2x) provide flexibility without weakening credit protection.`;
         } else if (q.includes('esg') || q.includes('sustainability')) {
-            response = `**ESG Profile:** Score **92/100** (SLLP Certified)\n\n• Environmental: 95/100\n• Social: 88/100\n• Governance: 93/100\n\nThis deal qualifies for **green bond eligibility** and includes a margin ratchet tied to sustainability KPIs. Based on our data, **${MARKET_STATS.esg_linked_pct}%** of comparable deals are ESG-linked.`;
+            response = `**ESG Profile for ${dealName}:** Score **${esgScore}/100** ${esgScore >= 80 ? '(SLLP Certified)' : ''}\n\n• Environmental: ${Math.min(esgScore + 3, 100)}/100\n• Social: ${Math.max(esgScore - 4, 0)}/100\n• Governance: ${Math.min(esgScore + 1, 100)}/100\n\nThis deal ${esgScore >= 85 ? 'qualifies for **green bond eligibility**' : 'may require ESG improvements'} and includes a margin ratchet tied to sustainability KPIs. Based on our data, **${MARKET_STATS.esg_linked_pct}%** of comparable deals are ESG-linked.`;
         } else if (q.includes('syndicate') || q.includes('bank') || q.includes('member')) {
-            response = "**Syndicate Composition:**\n\n| Bank | Role | Commitment |\n|------|------|------------|\n| Global Investment Bank | Arranger | $150M |\n| JP Morgan Chase | Co-Lead | $100M |\n| Bank of America | Member | $75M |\n| Citibank | Member | $75M |\n| Wells Fargo | Member | $50M |\n\n**Total Facility:** $450M";
+            response = `**Syndicate Composition for ${dealName}:**\n\n| Bank | Role | Commitment |\n|------|------|------------|\n${syndicateTable}\n\n**Total Facility:** ${facilityAmount}`;
         } else if (q.includes('proposal') || q.includes('ai') || q.includes('recommend')) {
-            response = `**AI-Proposed Resolution:**\n\nLeverage ratio of **5.0x** (market-aligned) with:\n• Step-down to 4.75x beginning Year 3\n• Two equity cure rights per period\n• 0.25x cushion per cure\n\n**Rationale:** Balances BofA's conservative stance with JPM's flexibility. Based on ${MARKET_STATS.sample_size} comparable LBO transactions. **Predicted acceptance: 85%**`;
+            response = `**AI-Proposed Resolution for ${dealName}:**\n\nLeverage ratio of **5.0x** (market-aligned) with:\n• Step-down to 4.75x beginning Year 3\n• Two equity cure rights per period\n• 0.25x cushion per cure\n\n**Rationale:** Balances conservative and flexible bank positions. Based on ${MARKET_STATS.sample_size} comparable ${dealType} transactions. **Predicted acceptance: 85%**`;
         } else if (q.includes('market') || q.includes('comparable')) {
-            response = `**Market Comparables (${MARKET_STATS.sample_size} deals):**\n\n• Median Leverage: **${MARKET_STATS.leverage.median}x**\n• 25th Percentile: ${MARKET_STATS.leverage.p25}x\n• 75th Percentile: ${MARKET_STATS.leverage.p75}x\n• Median Margin: SOFR + **${MARKET_STATS.margin.median}bps**\n• ESG-Linked: ${MARKET_STATS.esg_linked_pct}%\n\nYour deal at 5.0x leverage is within market range.`;
+            response = `**Market Comparables for ${dealType} Deals (${MARKET_STATS.sample_size} deals):**\n\n• Median Leverage: **${MARKET_STATS.leverage.median}x**\n• 25th Percentile: ${MARKET_STATS.leverage.p25}x\n• 75th Percentile: ${MARKET_STATS.leverage.p75}x\n• Median Margin: SOFR + **${MARKET_STATS.margin.median}bps**\n• ESG-Linked: ${MARKET_STATS.esg_linked_pct}%\n\nYour ${dealName} at ${facilityAmount} is within market range.`;
+        } else if (q.includes('document') || q.includes('agreement') || q.includes('generated')) {
+            const docCount = documents.filter(d => d.deal_id === currentDeal?.deal_id).length;
+            response = `**Documents for ${dealName}:**\n\n${docCount > 0 ? `${docCount} document(s) generated:\n` + documents.filter(d => d.deal_id === currentDeal?.deal_id).map(d => `• ${d.document_name} (${d.page_count} pages, ${d.status})`).join('\n') : 'No documents generated yet. Use the Document Generator to create LMA-compliant facility agreements.'}`;
         } else {
-            response = `I'm here to help with the **TechCorp LBO** ($450M facility). You can ask me about:\n\n• Leverage covenant negotiations\n• ESG compliance & sustainability\n• Syndicate member positions\n• Risk assessment\n• AI resolution proposals\n• Market comparables (${MARKET_STATS.sample_size} deals)\n\nWhat would you like to know?`;
+            response = `I'm here to help with **${dealName}** (${facilityAmount} ${dealType} facility for ${borrowerName}).\n\nYou can ask me about:\n\n• Leverage covenant negotiations\n• ESG compliance & sustainability (Score: ${esgScore}/100)\n• Syndicate member positions (${parties.length || 5} banks)\n• Risk assessment\n• AI resolution proposals\n• Market comparables (${MARKET_STATS.sample_size} deals)\n• Generated documents\n\nWhat would you like to know?`;
         }
 
         await new Promise(resolve => setTimeout(resolve, 800));
@@ -245,7 +292,10 @@ export function AIAssistant() {
                                                     </div>
                                                     <h3 className="text-xl font-bold text-white mb-2">How can I help you today?</h3>
                                                     <p className="text-slate-400 max-w-md mx-auto">
-                                                        Ask me anything about the TechCorp LBO deal — covenants, risks, ESG, syndicate positions, or AI recommendations.
+                                                        {currentDeal
+                                                            ? `Ask me anything about ${currentDeal.deal_name} — covenants, risks, ESG, syndicate positions, or AI recommendations.`
+                                                            : 'Generate or load a deal to get started. I can help with covenants, risks, ESG analysis, and AI recommendations.'
+                                                        }
                                                     </p>
 
                                                     {/* Mobile suggested questions */}

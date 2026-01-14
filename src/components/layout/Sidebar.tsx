@@ -23,7 +23,7 @@ const navigation = [
   { name: 'ESG Intelligence', href: '/analytics', icon: ChartBarIcon },
 ];
 
-// AI Chat Button Component - Premium Prominent Style
+// AI Chat Button Component - Premium Style with App-Matching Colors
 function AIChatButton({ isCollapsed }: { isCollapsed?: boolean }) {
   const { toggleAIChat } = useAppStore();
 
@@ -32,37 +32,28 @@ function AIChatButton({ isCollapsed }: { isCollapsed?: boolean }) {
       onClick={toggleAIChat}
       title={isCollapsed ? "AI Assistant" : undefined}
       className={clsx(
-        'group relative flex items-center px-3 py-3.5 text-sm font-semibold rounded-xl transition-all duration-300 w-full mt-4',
-        'bg-gradient-to-r from-primary-600/90 via-primary-500/80 to-gold-500/70',
-        'hover:from-primary-500 hover:via-primary-400 hover:to-gold-400',
-        'text-white shadow-lg shadow-primary-500/30',
-        'border border-primary-400/30 hover:border-primary-300/50',
+        'group relative flex items-center px-3 py-3 text-sm font-semibold rounded-xl transition-all duration-300 w-full mt-4',
+        'bg-gradient-to-r from-indigo-600 via-cyan-600 to-teal-500',
+        'hover:from-indigo-500 hover:via-cyan-500 hover:to-teal-400',
+        'text-white shadow-md',
+        'border border-cyan-400/20 hover:border-cyan-300/40',
         isCollapsed && 'justify-center'
       )}
-      whileHover={{ scale: 1.02, y: -1 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
     >
-      {/* Animated glow effect */}
-      <motion.div
-        className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-500/50 to-gold-500/50 blur-xl opacity-50"
-        animate={{ opacity: [0.3, 0.6, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Subtle glow - reduced opacity */}
+      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500/20 via-cyan-500/20 to-teal-500/20 blur-md" />
 
       {/* Content */}
       <div className={clsx("relative flex items-center", isCollapsed ? "justify-center" : "")}>
-        <motion.div
-          animate={{ rotate: [0, 10, -10, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <SparklesIcon
-            className={clsx(
-              "h-5 w-5 flex-shrink-0",
-              !isCollapsed && "mr-2.5"
-            )}
-            aria-hidden="true"
-          />
-        </motion.div>
+        <SparklesIcon
+          className={clsx(
+            "h-5 w-5 flex-shrink-0",
+            !isCollapsed && "mr-2.5"
+          )}
+          aria-hidden="true"
+        />
         {!isCollapsed && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -71,13 +62,9 @@ function AIChatButton({ isCollapsed }: { isCollapsed?: boolean }) {
             className="flex items-center gap-2"
           >
             <span className="whitespace-nowrap">AI Assistant</span>
-            <motion.span
-              className="px-1.5 py-0.5 text-[10px] font-bold bg-white/20 rounded-md uppercase tracking-wider"
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
+            <span className="px-1.5 py-0.5 text-[10px] font-bold bg-white/20 rounded-md uppercase tracking-wider">
               Live
-            </motion.span>
+            </span>
           </motion.div>
         )}
       </div>
