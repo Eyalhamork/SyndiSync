@@ -258,6 +258,45 @@ export default function DocumentGenerator() {
                   <p className="text-slate-400">Review your LMA-compliant Facility Agreement below.</p>
                 </div>
 
+                {/* Final Step Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
+                  <motion.button
+                    onClick={() => navigate('/documents')}
+                    className="group relative overflow-hidden bg-navy-800 rounded-2xl p-6 border border-white/10 hover:border-gold-500/50 transition-all text-left"
+                    whileHover={{ y: -4, boxShadow: '0 10px 30px -10px rgba(250, 204, 21, 0.3)' }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative z-10 flex items-start justify-between">
+                      <div>
+                        <div className="w-12 h-12 rounded-xl bg-gold-500/20 flex items-center justify-center text-gold-400 mb-4 text-2xl group-hover:scale-110 transition-transform">
+                          <DocumentTextIcon className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-1">View Full Agreement</h3>
+                        <p className="text-slate-400 text-sm">Open the interactive document viewer with AI insights.</p>
+                      </div>
+                      <ArrowLeftIcon className="w-5 h-5 text-gold-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rotate-180" />
+                    </div>
+                  </motion.button>
+
+                  <motion.button
+                    onClick={() => navigate('/negotiations')}
+                    className="group relative overflow-hidden bg-navy-800 rounded-2xl p-6 border border-white/10 hover:border-red-500/50 transition-all text-left"
+                    whileHover={{ y: -4, boxShadow: '0 10px 30px -10px rgba(239, 68, 68, 0.3)' }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative z-10 flex items-start justify-between">
+                      <div>
+                        <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400 mb-4 text-2xl group-hover:scale-110 transition-transform">
+                          <CpuChipIcon className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-1">Resolve Conflicts</h3>
+                        <p className="text-slate-400 text-sm">3 Conflicts detected in financial covenants.</p>
+                      </div>
+                      <ArrowLeftIcon className="w-5 h-5 text-red-500 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rotate-180" />
+                    </div>
+                  </motion.button>
+                </div>
+
                 <div className="bg-navy-800/30 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-2xl relative overflow-hidden group">
                   <div className="absolute top-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold-400/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                   <div className="p-8">

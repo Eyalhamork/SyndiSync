@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getApiKey, chatbotQuery, initializeGemini, isGeminiInitialized } from '../../lib/gemini';
 import { MARKET_STATS } from '../../data/comparable-deals';
 import { useAutoTypewriter } from '../../hooks/useTypewriter';
+import useAppStore from '../../store/appStore';
 
 interface Message {
     id: string;
@@ -36,7 +37,7 @@ function TypewriterMessage({ content, onComplete }: { content: string, onComplet
 }
 
 export function AIAssistant() {
-    const [isOpen, setIsOpen] = useState(false);
+    const { isAIChatOpen, toggleAIChat } = useAppStore();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -50,10 +51,10 @@ export function AIAssistant() {
 
     // Focus input when opened
     useEffect(() => {
-        if (isOpen) {
+        if (isAIChatOpen) {
             setTimeout(() => inputRef.current?.focus(), 300);
         }
-    }, [isOpen]);
+    }, [isAIChatOpen]);
 
     const handleSend = async () => {
         if (!input.trim() || isLoading) return;
@@ -143,55 +144,16 @@ export function AIAssistant() {
 
     return (
         <>
-            {/* Floating Robot Button */}
-            <AnimatePresence>
-                {!isOpen && (
-                    <motion.button
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 0, opacity: 0 }}
-                        onClick={() => setIsOpen(true)}
-                        className="fixed bottom-28 right-8 z-50 group"
-                    >
-                        {/* Glow effect */}
-                        <div className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-r from-primary-500 to-gold-500 blur-xl opacity-50 group-hover:opacity-80 transition-opacity" />
-
-                        {/* Button */}
-                        <motion.div
-                            className="relative w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-2xl flex items-center justify-center border-2 border-white/20"
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.95 }}
-                            animate={{
-                                boxShadow: ['0 0 20px rgba(59, 130, 246, 0.5)', '0 0 40px rgba(59, 130, 246, 0.8)', '0 0 20px rgba(59, 130, 246, 0.5)']
-                            }}
-                            transition={{
-                                boxShadow: { duration: 2, repeat: Infinity }
-                            }}
-                        >
-                            <span className="text-3xl">🤖</span>
-                        </motion.div>
-
-                        {/* Pulse rings */}
-                        <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-primary-400/50 animate-ping" />
-
-                        {/* AI Badge */}
-                        <span className="absolute -top-1 -right-1 w-6 h-6 bg-gold-500 rounded-full flex items-center justify-center text-[10px] font-bold text-navy-900 border-2 border-navy-900 shadow-lg">
-                            AI
-                        </span>
-                    </motion.button>
-                )}
-            </AnimatePresence>
-
             {/* Full-Width Bottom Panel */}
             <AnimatePresence>
-                {isOpen && (
+                {isAIChatOpen && (
                     <>
                         {/* Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            onClick={() => setIsOpen(false)}
+                            onClick={toggleAIChat}
                             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
                         />
 
@@ -235,7 +197,7 @@ export function AIAssistant() {
                                             <span className="text-xs text-slate-400">RAG-Enhanced</span>
                                         </div>
                                         <motion.button
-                                            onClick={() => setIsOpen(false)}
+                                            onClick={toggleAIChat}
                                             className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
                                             whileHover={{ scale: 1.1 }}
                                             whileTap={{ scale: 0.95 }}

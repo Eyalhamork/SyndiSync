@@ -67,7 +67,7 @@ export default function DocumentsList() {
   return (
     <div className="h-screen bg-navy-900 flex flex-col overflow-hidden text-slate-100">
       {/* Top Bar */}
-      <div className="h-16 glass-card flex items-center justify-between px-6 z-10 relative flex-shrink-0">
+      <div className="min-h-[5rem] py-4 glass-card flex items-center justify-between px-6 z-10 relative flex-shrink-0">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
             <FiArrowLeft size={20} />

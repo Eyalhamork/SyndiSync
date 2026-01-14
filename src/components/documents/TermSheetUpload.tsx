@@ -1,5 +1,6 @@
 // src/components/documents/TermSheetUpload.tsx
 import { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CloudArrowUpIcon, DocumentTextIcon, XMarkIcon, PhotoIcon, ExclamationTriangleIcon, CheckCircleIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import { ExtractedDealData, DEMO_DEAL_DATA } from '../../lib/pdf-generator';
@@ -310,31 +311,76 @@ export default function TermSheetUpload({ onFileUpload }: TermSheetUploadProps) 
               </div>
 
               {/* Validation Status */}
-              <div className={clsx(
-                'flex items-center justify-center gap-3 p-4 rounded-xl border backdrop-blur-sm',
-                validationState === 'validating' && 'bg-yellow-400/10 border-yellow-400/20',
-                validationState === 'valid' && 'bg-green-400/10 border-green-400/20',
-                validationState === 'invalid' && 'bg-red-400/10 border-red-400/20'
-              )}>
+              {/* Validation Status / AI Animation */}
+              <AnimatePresence mode="wait">
                 {validationState === 'validating' && (
-                  <>
-                    <div className="animate-spin h-5 w-5 border-2 border-yellow-400 border-t-transparent rounded-full"></div>
-                    <span className="text-yellow-300 font-medium tracking-wide">{validationMessage}</span>
-                  </>
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    key="validating"
+                    className="relative overflow-hidden bg-navy-900/80 rounded-xl border border-gold-500/30 p-6 backdrop-blur-md"
+                  >
+                    {/* Scanning Effect Overlay */}
+                    <div className="absolute inset-0 z-0 bg-grid-white/[0.02]" />
+                    <motion.div
+                      className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-400 to-transparent z-10 blur-sm"
+                      animate={{ top: ['0%', '100%', '0%'] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                    />
+
+                    <div className="relative z-20 flex flex-col items-center justify-center text-center">
+                      <div className="relative w-16 h-16 mb-4">
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-2 border-gold-500/30"
+                          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
+                        <motion.div
+                          className="absolute inset-2 rounded-full border-2 border-primary-400/50 border-t-transparent"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <SparklesIcon className="w-6 h-6 text-gold-400 animate-pulse" />
+                        </div>
+                      </div>
+
+                      <h4 className="text-lg font-bold text-white mb-1">AI Vision Active</h4>
+                      <p className="text-sm text-slate-400 font-mono mb-3">{validationMessage}</p>
+
+                      <div className="flex items-center gap-2 text-xs font-mono text-primary-400 bg-primary-900/20 px-3 py-1 rounded-full border border-primary-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-ping" />
+                        DETECTING ENTITIES & COVENANTS...
+                      </div>
+                    </div>
+                  </motion.div>
                 )}
+
                 {validationState === 'valid' && (
-                  <>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    key="valid"
+                    className="flex items-center justify-center gap-3 p-4 rounded-xl border bg-green-400/10 border-green-400/20 backdrop-blur-sm"
+                  >
                     <CheckCircleIcon className="h-5 w-5 text-green-400" />
                     <span className="text-green-300 font-medium tracking-wide">{validationMessage}</span>
-                  </>
+                  </motion.div>
                 )}
+
                 {validationState === 'invalid' && (
-                  <>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    key="invalid"
+                    className="flex items-center justify-center gap-3 p-4 rounded-xl border bg-red-400/10 border-red-400/20 backdrop-blur-sm"
+                  >
                     <ExclamationTriangleIcon className="h-5 w-5 text-red-400" />
                     <span className="text-red-300 font-medium tracking-wide">{validationMessage}</span>
-                  </>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
 
               {/* Use Demo Data Button (when validation fails) */}
               {showDemoOption && (

@@ -31,6 +31,8 @@ interface AppState {
   selectedNegotiation: string | null;
   isMobileMenuOpen: boolean;
   toasts: ToastMessage[];
+  isSidebarCollapsed: boolean;
+  isAIChatOpen: boolean;
 
   // Onboarding state
   isDemoMode: boolean;
@@ -56,8 +58,11 @@ interface AppState {
   setSelectedNegotiation: (id: string | null) => void;
 
   // Mobile menu
+
   setMobileMenuOpen: (open: boolean) => void;
   toggleMobileMenu: () => void;
+  toggleSidebar: () => void;
+  toggleAIChat: () => void;
 
   // Toast notifications
   showToast: (type: ToastType, title: string, message?: string) => void;
@@ -97,6 +102,8 @@ const useAppStore = create<AppState>()(
       generationStep: '',
       selectedNegotiation: null,
       isMobileMenuOpen: false,
+      isSidebarCollapsed: false,
+      isAIChatOpen: false,
       toasts: [],
 
       isDemoMode: true,
@@ -161,6 +168,8 @@ const useAppStore = create<AppState>()(
       // Mobile menu
       setMobileMenuOpen: (open) => set({ isMobileMenuOpen: open }),
       toggleMobileMenu: () => set((state) => ({ isMobileMenuOpen: !state.isMobileMenuOpen })),
+      toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
+      toggleAIChat: () => set((state) => ({ isAIChatOpen: !state.isAIChatOpen })),
 
       // Toast notifications
       showToast: (type, title, message) => {
@@ -239,7 +248,8 @@ const useAppStore = create<AppState>()(
         currentDeal: state.currentDeal,
         isDemoMode: state.isDemoMode,
         hasCompletedOnboarding: state.hasCompletedOnboarding,
-        currentUser: state.currentUser
+        currentUser: state.currentUser,
+        isSidebarCollapsed: state.isSidebarCollapsed
       })
     }
   )
